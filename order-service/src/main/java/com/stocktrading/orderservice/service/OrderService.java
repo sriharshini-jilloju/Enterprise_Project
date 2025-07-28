@@ -1,70 +1,55 @@
-package com.stocktrading.orderservice.service;
+package com.stocktrading.orderservice.Service;
 
-import com.stocktrading.orderservice.entity.Order;
-import com.stocktrading.orderservice.entity.User;
-import com.stocktrading.orderservice.repository.OrderRepository;
-import com.stocktrading.orderservice.repository.UserRepository;
-import com.stocktrading.orderservice.client.MarketServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
+import com.stocktrading.orderservice.Entity.Order;
+import com.stocktrading.orderservice.Repository.OrderRepository;
+import com.stocktrading.orderservice.DTO.MarketOrder;
 
 @Service
 public class OrderService {
     
     @Autowired
-    private OrderRepository orderRepository;
+    private OrderRepository repo;
     
     @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private MarketServiceClient marketServiceClient;
+    private RestTemplate restTemplate;
 
-    public Order createOrder(Order order) {
-        // Validate user exists
-        Optional<User> user = userRepository.findById(order.getUserId());
-        if (user.isEmpty()) {
-            throw new RuntimeException("User not found");
+    public Order placeOrder(Order order) {
+        order.setStatus("PENDING");
+        Order savedOrder = repo.save(order);
+        
+        // Forward to market service
+        try {
+            forwardToMarket(savedOrder);
+            savedOrder.setStatus("COMPLETED");
+        } catch (Exception e) {
+            savedOrder.setStatus("FAILED");
         }
         
-        // Save order
-        Order savedOrder = orderRepository.save(order);
+        return repo.save(savedOrder);
+    }
+
+    private void forwardToMarket(Order order) {
+        // Option 1: Using your MarketOrder DTO
+        MarketOrder mo = new MarketOrder();
+        mo.setStockName(order.getStockSymbol()); // Assuming you have getStockSymbol()
+        mo.setQuantity(order.getUnits()); // Assuming you have getUnits()
         
-        // Send to market service
-        marketServiceClient.processOrder(savedOrder);
+        // Call market service - make sure the URL matches your MarketController
+        restTemplate.postForEntity(
+            "http://localhost:8082/api/market/place", 
+            mo, 
+            String.class
+        );
         
-        return savedOrder;
-    }
-
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
-    }
-
-    public List<Order> getOrdersByUserId(String userId) {
-        return orderRepository.findByUserId(userId);
-    }
-
-    public Optional<Order> getOrderById(String id) {
-        return orderRepository.findById(id);
-    }
-
-    public Order updateOrderStatus(String orderId, String status) {
-        Optional<Order> orderOpt = orderRepository.findById(orderId);
-        if (orderOpt.isPresent()) {
-            Order order = orderOpt.get();
-            order.setStatus(status);
-            return orderRepository.save(order);
-        }
-        throw new RuntimeException("Order not found");
-    }
-
-    public User createUser(User user) {
-        return userRepository.save(user);
-    }
-
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+       
     }
 }

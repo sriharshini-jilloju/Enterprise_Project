@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Market</title>
+</head>
+<body>
+<h1>Available Stocks</h1>
+<div th:if="${errorMessage}">
+    <p style="color:red" th:text="${errorMessage}"></p>
+</div>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Stock Symbol</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Available Units</th>
+            <th>Order</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${marketItems}">
+        <td th:text="${item.stockSymbol}">SYM</td>
+        <td th:text="${item.name}">Name</td>
+        <td th:text="${item.price}">0.0</td>
+        <td th:text="${item.availableUnits}">0</td>
+        <td>
+            <form action="/api/orders/place" method="post">
+                <input type="hidden" name="username" th:value="${username}" />
+                <input type="hidden" name="stock" th:value="${item.stockSymbol}" />
+                <input type="number" name="units" min="1" max="${item.availableUnits}" required />
+                <button type="submit">Buy</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

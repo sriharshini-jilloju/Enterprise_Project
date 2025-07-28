@@ -1,80 +1,168 @@
-package com.stocktrading.orderservice.entity;
+package com.stocktrading.orderservice.Entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 @Document(collection = "orders")
 public class Order {
     @Id
     private String id;
-    
-    @JsonProperty("userId")
-    private String userId;
-    
-    @JsonProperty("stockSymbol")
+    private String username;
     private String stockSymbol;
-    
-    @JsonProperty("quantity")
-    private Integer quantity;
-    
-    @JsonProperty("orderType")
-    private String orderType; // BUY, SELL
-    
-    @JsonProperty("price")
-    private Double price;
-    
-    @JsonProperty("status")
-    private String status; // PENDING, COMPLETED, CANCELLED
-    
-    @JsonProperty("orderDate")
-    private LocalDateTime orderDate;
-    
-    @JsonProperty("accountId")
-    private String accountId;
+    private int units;
+    private double price;
+    private String status;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    // Constructors
+    // Order status constants
+    public static final String STATUS_PENDING = "PENDING";
+    public static final String STATUS_COMPLETED = "COMPLETED";
+    public static final String STATUS_CANCELLED = "CANCELLED";
+    public static final String STATUS_FAILED = "FAILED";
+
+    // Default constructor
     public Order() {
-        this.orderDate = LocalDateTime.now();
-        this.status = "PENDING";
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.status = STATUS_PENDING;
     }
 
-    public Order(String userId, String stockSymbol, Integer quantity, String orderType, Double price, String accountId) {
+    // Constructor with parameters
+    public Order(String username, String stockSymbol, int units, double price) {
         this();
-        this.userId = userId;
+        this.username = username;
         this.stockSymbol = stockSymbol;
-        this.quantity = quantity;
-        this.orderType = orderType;
+        this.units = units;
         this.price = price;
-        this.accountId = accountId;
     }
 
-    // Getters and Setters
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    // Getters
+    public String getId() {
+        return id;
+    }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public String getUsername() {
+        return username;
+    }
 
-    public String getStockSymbol() { return stockSymbol; }
-    public void setStockSymbol(String stockSymbol) { this.stockSymbol = stockSymbol; }
+    public String getStockSymbol() {
+        return stockSymbol;
+    }
 
-    public Integer getQuantity() { return quantity; }
-    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    public int getUnits() {
+        return units;
+    }
 
-    public String getOrderType() { return orderType; }
-    public void setOrderType(String orderType) { this.orderType = orderType; }
+    public double getPrice() {
+        return price;
+    }
 
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
+    public String getStatus() {
+        return status;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-    public LocalDateTime getOrderDate() { return orderDate; }
-    public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
-    public String getAccountId() { return accountId; }
-    public void setAccountId(String accountId) { this.accountId = accountId; }
+    // Setters
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setStockSymbol(String stockSymbol) {
+        this.stockSymbol = stockSymbol;
+    }
+
+    public void setUnits(int units) {
+        this.units = units;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    // Utility methods for order management
+    public double getTotalValue() {
+        return this.price * this.units;
+    }
+
+    public boolean isPending() {
+        return STATUS_PENDING.equals(this.status);
+    }
+
+    public boolean isCompleted() {
+        return STATUS_COMPLETED.equals(this.status);
+    }
+
+    public boolean isCancelled() {
+        return STATUS_CANCELLED.equals(this.status);
+    }
+
+    public boolean isFailed() {
+        return STATUS_FAILED.equals(this.status);
+    }
+
+    public void markAsCompleted() {
+        this.setStatus(STATUS_COMPLETED);
+    }
+
+    public void markAsCancelled() {
+        this.setStatus(STATUS_CANCELLED);
+    }
+
+    public void markAsFailed() {
+        this.setStatus(STATUS_FAILED);
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id='" + id + '\'' +
+                ", username='" + username + '\'' +
+                ", stockSymbol='" + stockSymbol + '\'' +
+                ", units=" + units +
+                ", price=" + price +
+                ", status='" + status + '\'' +
+                ", totalValue=" + getTotalValue() +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Order order = (Order) o;
+        return id != null ? id.equals(order.id) : order.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

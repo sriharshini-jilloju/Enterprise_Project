@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Order Confirmation</title>
+</head>
+<body>
+<h2>Order Confirmation</h2>
+<p th:text="'Order placed for ' + ${units} + ' units of ' + ${stock}"></p>
+<a href="/market">Back to Market</a>
+</body>
+</html>
