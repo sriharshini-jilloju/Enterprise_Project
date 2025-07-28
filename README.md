@@ -7,7 +7,6 @@ Video Recording
 
 https://youtu.be/5AVqrWrqsjo
 
-Contributors
 
 Sri Harshini Jilloju - N01649103
 
