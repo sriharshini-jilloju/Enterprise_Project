@@ -10,6 +10,8 @@ https://youtu.be/5AVqrWrqsjo
 
 📹 Project Demo Part2 Video:
 
+https://youtu.be/njfEk_1JxJA
+
 
 Sri Harshini Jilloju - N01649103
 
