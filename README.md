@@ -3,9 +3,11 @@ Overview
 This is the repository for the Enterprise Project developed as part of team. 
 
 Video Recording
-📹 Project Demo Video:
+📹 Project Demo Part1 Video:
 
 https://youtu.be/5AVqrWrqsjo
+
+📹 Project Demo Part2 Video:
 
 
 Sri Harshini Jilloju - N01649103
